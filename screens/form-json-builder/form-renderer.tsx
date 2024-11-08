@@ -15,8 +15,24 @@ import { FormFieldType } from '@/types'
 
 // Convert the JSON form field type to FormFieldType
 const convertJsonFieldToFormField = (jsonField: any): FormFieldType => {
+  // Map common input types to their proper variants
+  const typeToVariant: { [key: string]: string } = {
+    text: 'Input',
+    email: 'Input',
+    textarea: 'Textarea',
+    password: 'Password',
+    checkbox: 'Checkbox',
+    select: 'Select',
+    file: 'File Input',
+    date: 'Date Picker',
+    datetime: 'Datetime Picker',
+    phone: 'Phone',
+  }
+
   return {
-    variant: jsonField.type.charAt(0).toUpperCase() + jsonField.type.slice(1),
+    variant:
+      typeToVariant[jsonField.type] ||
+      jsonField.type.charAt(0).toUpperCase() + jsonField.type.slice(1),
     type: jsonField.type || '',
     label: jsonField.label,
     name: jsonField.name,

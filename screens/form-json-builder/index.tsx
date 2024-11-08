@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
 
 // Dynamically import CodeMirror to avoid SSR issues
 const CodeMirror = dynamic(
@@ -476,6 +477,7 @@ const FormJsonBuilder = () => {
   )
   const [formData, setFormData] = React.useState(defaultFormJson)
   const [error, setError] = React.useState<string>('')
+  const [key, setKey] = React.useState(0)
 
   const handleJsonChange = (value: string) => {
     setJsonValue(value)
@@ -485,6 +487,19 @@ const FormJsonBuilder = () => {
       setError('')
     } catch (e) {
       setError('Invalid JSON format')
+    }
+  }
+
+  const handleRefresh = () => {
+    try {
+      const parsed = JSON.parse(jsonValue)
+      setFormData(parsed)
+      setError('')
+      setKey((prev) => prev + 1)
+      toast.success('Form refreshed successfully')
+    } catch (e) {
+      setError('Invalid JSON format')
+      toast.error('Failed to refresh form: Invalid JSON format')
     }
   }
 
@@ -547,7 +562,12 @@ const FormJsonBuilder = () => {
       {/* Existing Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-4">
-          <h2 className="text-lg font-semibold mb-4">Form JSON Editor</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Form JSON Editor</h2>
+            <Button variant="outline" size="sm" onClick={handleRefresh}>
+              Refresh Form
+            </Button>
+          </div>
           <Separator className="mb-4" />
           <ScrollArea className="h-[600px] w-full">
             <CodeMirror
@@ -588,7 +608,7 @@ const FormJsonBuilder = () => {
           <h2 className="text-lg font-semibold mb-4">Form Preview</h2>
           <Separator className="mb-4" />
           <ScrollArea className="h-[600px] w-full">
-            <FormRenderer formData={formData} />
+            <FormRenderer key={key} formData={formData} />
           </ScrollArea>
         </Card>
       </div>
