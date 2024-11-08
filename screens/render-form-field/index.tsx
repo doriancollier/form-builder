@@ -111,34 +111,42 @@ const FileSvgDraw = () => {
   )
 }
 
-export const renderFormField = (field: FormFieldType, form: any) => {
-  const [checked, setChecked] = useState<boolean>(field.checked)
-  const [value, setValue] = useState<any>(field.value)
-  const [selectedValues, setSelectedValues] = useState<string[]>(['React'])
-  const [tagsValue, setTagsValue] = useState<string[]>([])
-  const [files, setFiles] = useState<File[] | null>(null) // Initialize to null or use [] for an empty array
-  const [date, setDate] = useState<Date>()
-  const [datetime, setDatetime] = useState<Date>()
-  const [smartDatetime, setSmartDatetime] = useState<Date>()
-  const [countryName, setCountryName] = useState<string>('')
-  const [stateName, setStateName] = useState<string>('')
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  const dropZoneConfig = {
-    maxFiles: 5,
-    maxSize: 1024 * 1024 * 4,
-    multiple: true,
-  }
-
+export const renderFormField = (
+  field: FormFieldType,
+  form: any,
+  state: {
+    checked: boolean
+    setChecked: (value: boolean) => void
+    smartDatetime: Date | undefined
+    setSmartDatetime: (date: Date) => void
+    tagsValue: string[]
+    setTagsValue: (tags: string[]) => void
+    canvasRef: React.RefObject<HTMLCanvasElement>
+    value?: string
+    setValue: (value: string) => void
+    date?: Date
+    setDate: (date: Date | undefined) => void
+    selectedValues: string[]
+    setSelectedValues: (values: string[]) => void
+    countryName: string
+    setCountryName: (name: string) => void
+    stateName: string
+    setStateName: (name: string) => void
+    files: File[] | null
+    setFiles: (files: File[] | null) => void
+    datetime?: Date
+    setDatetime: (date: Date) => void
+  },
+) => {
   switch (field.variant) {
     case 'Checkbox':
       return (
         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
           <FormControl>
             <Checkbox
-              checked={checked} // Ensure this is handled as boolean
+              checked={state.checked}
               onCheckedChange={() => {
-                setChecked(!checked)
+                state.setChecked(!state.checked)
               }}
               disabled={field.disabled}
             />
@@ -164,12 +172,13 @@ export const renderFormField = (field: FormFieldType, form: any) => {
                   role="combobox"
                   className={cn(
                     'w-full justify-between',
-                    !value && 'text-muted-foreground',
+                    !state.value && 'text-muted-foreground',
                   )}
                 >
-                  {value
-                    ? languages.find((language) => language.value === value)
-                        ?.label
+                  {state.value
+                    ? languages.find(
+                        (language) => language.value === state.value,
+                      )?.label
                     : 'Select language'}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -186,14 +195,14 @@ export const renderFormField = (field: FormFieldType, form: any) => {
                         value={language.label}
                         key={language.value}
                         onSelect={() => {
-                          setValue(language.value)
+                          state.setValue(language.value)
                           form.setValue(field.name, language.value)
                         }}
                       >
                         <Check
                           className={cn(
                             'mr-2 h-4 w-4',
-                            language.value === value
+                            language.value === state.value
                               ? 'opacity-100'
                               : 'opacity-0',
                           )}
@@ -223,19 +232,25 @@ export const renderFormField = (field: FormFieldType, form: any) => {
                   variant={'outline'}
                   className={cn(
                     'w-full justify-start text-left font-normal',
-                    !date && 'text-muted-foreground',
+                    !state.date && 'text-muted-foreground',
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, 'PPP') : <span>Pick a date</span>}
+                  {state.date ? (
+                    format(state.date, 'PPP')
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
                 </Button>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={date}
-                onSelect={setDate}
+                selected={state.date}
+                onSelect={(date) => {
+                  state.setDate(date)
+                }}
                 disabled={(date) =>
                   date > new Date() || date < new Date('1900-01-01')
                 }
@@ -255,8 +270,12 @@ export const renderFormField = (field: FormFieldType, form: any) => {
           </div>
           <DatetimePicker
             {...field}
-            value={datetime}
-            onChange={setDatetime}
+            value={state.datetime}
+            onChange={(datetime) => {
+              if (datetime) {
+                state.setDatetime(datetime)
+              }
+            }}
             format={[
               ['months', 'days', 'years'],
               ['hours', 'minutes', 'am/pm'],
@@ -272,9 +291,15 @@ export const renderFormField = (field: FormFieldType, form: any) => {
           <FormLabel>{field.label}</FormLabel> {field.required && '*'}
           <FormControl>
             <FileUploader
-              value={files}
-              onValueChange={setFiles}
-              dropzoneOptions={dropZoneConfig}
+              value={state.files}
+              onValueChange={(files) => {
+                state.setFiles(files || null)
+              }}
+              dropzoneOptions={{
+                maxFiles: 5,
+                maxSize: 1024 * 1024 * 4,
+                multiple: true,
+              }}
               className="relative bg-background rounded-lg p-2"
             >
               <FileInput
@@ -286,9 +311,9 @@ export const renderFormField = (field: FormFieldType, form: any) => {
                 </div>
               </FileInput>
               <FileUploaderContent>
-                {files &&
-                  files.length > 0 &&
-                  files.map((file, i) => (
+                {state.files &&
+                  state.files.length > 0 &&
+                  state.files.map((file, i) => (
                     <FileUploaderItem key={i} index={i}>
                       <Paperclip className="h-4 w-4 stroke-current" />
                       <span>{file.name}</span>
@@ -346,12 +371,18 @@ export const renderFormField = (field: FormFieldType, form: any) => {
           </div>
           <LocationSelector
             onCountryChange={(country) => {
-              setCountryName(country?.name || '')
-              form.setValue(field.name, [country?.name || '', stateName || ''])
+              state.setCountryName(country?.name || '')
+              form.setValue(field.name, [
+                country?.name || '',
+                state.stateName || '',
+              ])
             }}
-            onStateChange={(state) => {
-              setStateName(state?.name || '')
-              form.setValue(field.name, [countryName || '', state?.name || ''])
+            onStateChange={(stateData) => {
+              state.setStateName(stateData?.name || '')
+              form.setValue(field.name, [
+                state.countryName || '',
+                stateData?.name || '',
+              ])
             }}
           />
           <FormDescription>{field.description}</FormDescription>
@@ -364,9 +395,9 @@ export const renderFormField = (field: FormFieldType, form: any) => {
           <FormLabel>{field.label}</FormLabel>
           <FormControl>
             <MultiSelector
-              values={selectedValues}
+              values={state.selectedValues}
               onValuesChange={(newValues) => {
-                setSelectedValues(newValues)
+                state.setSelectedValues(newValues)
                 form.setValue(field.name, newValues, {
                   shouldValidate: true,
                   shouldDirty: true,
@@ -426,12 +457,12 @@ export const renderFormField = (field: FormFieldType, form: any) => {
               step={step}
               defaultValue={[defaultValue]}
               onValueChange={(value) => {
-                setValue(value[0])
-              }} // Update to set the first value as a number
+                state.setValue(value[0].toString())
+              }}
             />
           </FormControl>
           <FormDescription className="py-3">
-            {field.description} Selected value is {value || defaultValue},
+            {field.description} Selected value is {state.value || defaultValue},
             minimun valus is {min}, maximim values is {max}, step size is {step}
           </FormDescription>
           <FormMessage />
@@ -443,7 +474,7 @@ export const renderFormField = (field: FormFieldType, form: any) => {
           <FormLabel>{field.label}</FormLabel>
           <FormControl>
             <SignatureInput
-              canvasRef={canvasRef}
+              canvasRef={state.canvasRef}
               onSignatureChange={(signature) => {
                 if (signature) field.onChange(signature)
               }}
@@ -461,8 +492,8 @@ export const renderFormField = (field: FormFieldType, form: any) => {
           <FormLabel>{field.label}</FormLabel>
           <FormControl>
             <SmartDatetimeInput
-              value={smartDatetime}
-              onValueChange={(newDate) => setSmartDatetime(newDate)}
+              value={state.smartDatetime}
+              onValueChange={(newDate) => state.setSmartDatetime(newDate)}
               placeholder="e.g. tomorrow at 3pm"
             />
           </FormControl>
@@ -481,9 +512,9 @@ export const renderFormField = (field: FormFieldType, form: any) => {
           </div>
           <FormControl>
             <Switch
-              checked={checked}
+              checked={state.checked}
               onCheckedChange={() => {
-                setChecked(!checked)
+                state.setChecked(!state.checked)
               }}
             />
           </FormControl>
@@ -499,9 +530,9 @@ export const renderFormField = (field: FormFieldType, form: any) => {
           <FormLabel>{field.label}</FormLabel>
           <FormControl>
             <TagsInput
-              value={tagsValue}
+              value={state.tagsValue}
               onValueChange={(newTags) => {
-                setTagsValue(newTags)
+                state.setTagsValue(newTags)
                 form.setValue(field.name, newTags, {
                   shouldValidate: true,
                   shouldDirty: true,

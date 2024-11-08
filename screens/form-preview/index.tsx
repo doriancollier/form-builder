@@ -41,10 +41,32 @@ const renderFormFields = (fields: FormFieldOrGroup[], form: any) => {
                 <FormItem className={`col-span-${colSpan}`}>
                   <FormControl>
                     {React.cloneElement(
-                      renderFormField(field, form) as React.ReactElement,
+                      renderFormField(field, form, {
+                        checked: false,
+                        setChecked: () => {},
+                        smartDatetime: undefined,
+                        setSmartDatetime: () => {},
+                        tagsValue: [],
+                        setTagsValue: () => {},
+                        canvasRef: { current: null },
+                        value: '',
+                        setValue: () => {},
+                        date: undefined,
+                        setDate: () => {},
+                        selectedValues: [],
+                        setSelectedValues: () => {},
+                        countryName: '',
+                        setCountryName: () => {},
+                        stateName: '',
+                        setStateName: () => {},
+                        files: null,
+                        setFiles: () => {},
+                        datetime: undefined,
+                        setDatetime: () => {},
+                      }) as React.ReactElement,
                       {
                         ...formField,
-                      },
+                      } as React.JSX.IntrinsicAttributes & any,
                     )}
                   </FormControl>
                 </FormItem>
@@ -63,10 +85,32 @@ const renderFormFields = (fields: FormFieldOrGroup[], form: any) => {
             <FormItem>
               <FormControl>
                 {React.cloneElement(
-                  renderFormField(fieldOrGroup, form) as React.ReactElement,
+                  renderFormField(fieldOrGroup, form, {
+                    checked: false,
+                    setChecked: () => {},
+                    smartDatetime: undefined,
+                    setSmartDatetime: () => {},
+                    tagsValue: [],
+                    setTagsValue: () => {},
+                    canvasRef: { current: null },
+                    value: '',
+                    setValue: () => {},
+                    date: undefined,
+                    setDate: () => {},
+                    selectedValues: [],
+                    setSelectedValues: () => {},
+                    countryName: '',
+                    setCountryName: () => {},
+                    stateName: '',
+                    setStateName: () => {},
+                    files: null,
+                    setFiles: () => {},
+                    datetime: undefined,
+                    setDatetime: () => {},
+                  }) as React.ReactElement,
                   {
                     ...formField,
-                  },
+                  } as React.JSX.IntrinsicAttributes & any,
                 )}
               </FormControl>
             </FormItem>
@@ -79,6 +123,9 @@ const renderFormFields = (fields: FormFieldOrGroup[], form: any) => {
 
 export const FormPreview: React.FC<FormPreviewProps> = ({ formFields }) => {
   const formSchema = generateZodSchema(formFields)
+
+  console.log('formFields', formFields)
+  console.log('formSchema', formSchema)
 
   const defaultVals = generateDefaultValues(formFields)
 
@@ -183,13 +230,18 @@ export const FormPreview: React.FC<FormPreviewProps> = ({ formFields }) => {
                       h-full md:max-h-[70vh] overflow-auto`}
                       style={style}
                     >
-                      {tokens.map((line: any, i: number) => (
-                        <div {...getLineProps({ line, key: i })}>
-                          {line.map((token: any, key: any) => (
-                            <span {...getTokenProps({ token, key })} />
-                          ))}
-                        </div>
-                      ))}
+                      {tokens.map(
+                        (
+                          line: Array<{ types: string[]; content: string }>,
+                          i: number,
+                        ) => (
+                          <div key={i} {...getLineProps({ line })}>
+                            {line.map((token, key) => (
+                              <span key={key} {...getTokenProps({ token })} />
+                            ))}
+                          </div>
+                        ),
+                      )}
                     </pre>
                   )}
                 </Highlight>

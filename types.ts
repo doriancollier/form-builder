@@ -21,6 +21,7 @@ export type FormFieldType = {
   min?: number
   max?: number
   step?: number
+  options?: { label: string; value: string }[]
 }
 
 export type FieldType = { name: string; isNew: boolean; index?: number }
