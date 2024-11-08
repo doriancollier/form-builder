@@ -3,7 +3,6 @@ import { Slot, Slottable } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
-import { SmileIcon } from '@/components/smile'
 
 import { IoIosArrowRoundForward } from 'react-icons/io'
 
@@ -110,7 +109,6 @@ const Button = React.forwardRef<
         {variant === 'arrow' && (
           <IoIosArrowRoundForward className="text-muted-foreground text-xl transition-transform duration-300 group-hover:-rotate-45" />
         )}
-        {variant === 'smile' && <SmileIcon />}
       </Comp>
     )
   },

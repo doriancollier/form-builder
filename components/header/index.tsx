@@ -16,7 +16,6 @@ import If from '@/components/ui/if'
 import { LuGithub, LuMenu } from 'react-icons/lu'
 import { FaXTwitter } from 'react-icons/fa6'
 
-import Logo from '@/assets/logo.svg'
 import { usePathname } from 'next/navigation'
 
 type Tabs = {
@@ -41,12 +40,7 @@ type Tabs = {
 
 const tabs: Tabs[] = [
   { name: 'Hi', href: '/readme', variant: 'smile' },
-  {
-    name: 'Roadmap',
-    href: 'https://shadcnform.featurebase.app/',
-    variant: 'arrow',
-    isNewTab: true,
-  },
+
   { name: 'Components', href: '/components', variant: 'linkHover2' },
   { name: 'Templates', href: '/templates', variant: 'linkHover2' },
 ]
@@ -58,11 +52,11 @@ export default function Header() {
   return (
     <header className="max-w-5xl mx-auto flex justify-between items-center my-5 px-5 lg:px-0">
       <Link href="/" className="cursor-pointer md:hidden">
-        <Logo className="w-9 h-9" />
+        LOGO WAS HERE
       </Link>
       <nav className="hidden md:flex items-center gap-3">
         <Link href="/" className="cursor-pointer">
-          <Logo className="w-9 h-9" />
+          LOGO WAS HERE
         </Link>
         {tabs.map((tab, i) => (
           <Link
@@ -99,19 +93,6 @@ export default function Header() {
             className="g-primary text-white rounded-full px-4"
           >
             Playground
-          </Button>
-        </Link>
-        <Link
-          href="https://github.com/hasanharman/form-builder"
-          target="_blank"
-        >
-          <Button variant="outline" className="rounded-full p-2">
-            <LuGithub className="text-lg" />
-          </Button>
-        </Link>
-        <Link href="https://x.com/strad3r" target="_blank">
-          <Button variant="outline" className="rounded-full p-2">
-            <FaXTwitter className="text-lg" />
           </Button>
         </Link>
       </div>
